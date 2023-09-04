@@ -12,6 +12,13 @@ app.use(cors());
 // api routes
 app.use('/users', require('./users/users.controller'));
 
+//app.use('/roles', require('./app/routes/roles.routes.js'));
+
+//app.use('/roles', require('./roles/roles.controller'));
+// require("./app/routes/tutorial.routes.js")(app);
+require("./app/routes/roles.routes")(app);
+//app.use('/roles', require('./app/routes/roles.routes.js'));
+
 // global error handler
 app.use(errorHandler);
 

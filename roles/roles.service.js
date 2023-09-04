@@ -1,19 +1,23 @@
-﻿const config = require('config.json');
+const config = require('config.json');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const db = require('_helpers/db');
+//const db = require('_helpers/db');
+
+const Role = require('../roles/roles.model');
+const Permission = require('../roles/permission.model');
+
 
 module.exports = {
     authenticate,
     getAll,
     getById,
     create,
-    update,
+     update,
     delete: _delete
 };
 
 async function authenticate({ username, password }) {
-    const user = await db.User.scope('withHash').findOne({ where: { username } });
+    const user = await Role.scope('withHash').findOne({ where: { username } });
 
     if (!user || !(await bcrypt.compare(password, user.hash)))
         throw 'Username or password is incorrect';
@@ -24,7 +28,7 @@ async function authenticate({ username, password }) {
 }
 
 async function getAll() {
-    return await db.User.findAll();
+    return await Role.findAll();
 }
 
 async function getById(id) {
@@ -32,26 +36,32 @@ async function getById(id) {
 }
 
 async function create(params) {
-    // validate
-    if (await db.User.findOne({ where: { username: params.username } })) {
-        throw 'Username "' + params.username + '" is already taken';
-    }
-
-    // hash password
-    if (params.password) {
-        params.hash = await bcrypt.hash(params.password, 10);
-    }
-
+ 
     // save user
-    await db.User.create(params);
+    console.log(params)
+   const Main = await Role.create(params);
+    //await Role.create({ role_name:params.role_name , role_description:params.role_description ,role_type:params.role_type});
+   
+    const headerId = Main.role_id     
+    const activity_id = Main.activity_id
+    
+    console.log("activity_id" + activity_id);
+   await Permission.create({ main_role_id:headerId , activity_id:activity_id ,permission_text:"1"})      
+
 }
+
+
+// async function permiss(params) {
+     
+    
+// }
 
 async function update(id, params) {
     const user = await getUser(id);
 
     // validate
     const usernameChanged = params.username && user.username !== params.username;
-    if (usernameChanged && await db.User.findOne({ where: { username: params.username } })) {
+    if (usernameChanged && await Role.findOne({ where: { username: params.username } })) {
         throw 'Username "' + params.username + '" is already taken';
     }
 
@@ -75,7 +85,7 @@ async function _delete(id) {
 // helper functions
 
 async function getUser(id) {
-    const user = await db.User.findByPk(id);
+    const user = await Role.findByPk(id);
     if (!user) throw 'User not found';
     return user;
 }
