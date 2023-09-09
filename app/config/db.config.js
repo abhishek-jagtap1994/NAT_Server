@@ -3,7 +3,7 @@ module.exports = {
   USER: "root",
   PASSWORD: "",
   DB: "node-mysql-registration-login-api",
-    port: 3306 
+    port: 3306
   };
 
 
